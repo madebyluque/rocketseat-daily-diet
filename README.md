@@ -1,5 +1,7 @@
 # TASKS
 
+Click here to see the [challenge.](https://efficient-sloth-d85.notion.site/Desafio-02-be7cdb37aaf74ba898bc6336427fa410)
+
 Create the following endpoints:
 
 - [ ] [POST] /auth
