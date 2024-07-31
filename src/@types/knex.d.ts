@@ -9,6 +9,8 @@ declare module 'knex/types/tables' {
       description: string
       datetime: string
       within_diet: boolean
+      created_at: string
+      updated_at: string
     }
   }
 }

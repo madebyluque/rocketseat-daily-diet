@@ -84,6 +84,8 @@ export async function mealsRoutes(app: FastifyInstance) {
       meal.within_diet = withinDiet
     }
 
+    meal.updated_at = new Date().toISOString()
+
     await knex('meals').where('id', id).update(meal)
 
     reply.status(200).send({
