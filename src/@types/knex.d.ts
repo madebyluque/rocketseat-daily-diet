@@ -11,6 +11,13 @@ declare module 'knex/types/tables' {
       within_diet: boolean
       created_at: string
       updated_at: string
+      user_id: string
+    }
+    user: {
+      id: string
+      name: string
+      email: string
+      password: string
     }
   }
 }

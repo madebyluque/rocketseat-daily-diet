@@ -21,18 +21,22 @@ export async function mealsRoutes(app: FastifyInstance) {
       const { name, description, datetime, withinDiet } =
         createMealBodySchema.parse(request.body)
 
+      const { userId } = request.user
+
       await knex('meals').insert({
         id: randomUUID(),
         name,
         description,
         datetime,
         within_diet: withinDiet,
+        user_id: userId,
       })
 
       return reply.status(201).send()
     },
   )
 
+  // TODO: create dto to send meal response
   app.get(
     '/:id',
     {
@@ -40,7 +44,12 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { id } = idParamSchema.parse(request.params)
-      const meal = await knex('meals').where('id', id).first()
+      const { userId } = request.user
+
+      const meal = await knex('meals')
+        .where('id', id)
+        .where('user_id', userId)
+        .first()
 
       if (!meal) {
         reply.status(404).send()
@@ -52,7 +61,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
-  // TODO: pagination
+  // TODO: create dto to send meal response
   app.get(
     '/',
     {
@@ -68,7 +77,9 @@ export async function mealsRoutes(app: FastifyInstance) {
         request.params,
       )
 
-      const meals = await knex('meals').paginate({
+      const { userId } = request.user
+
+      const meals = await knex('meals').where('user_id', userId).paginate({
         perPage: pageSize,
         currentPage,
       })
@@ -79,6 +90,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
+  // TODO: create dto to send meal response
   app.put(
     '/:id',
     {
@@ -93,10 +105,16 @@ export async function mealsRoutes(app: FastifyInstance) {
         datetime: z.string().optional(),
         withinDiet: z.boolean().optional(),
       })
+
       const { name, description, datetime, withinDiet } =
         updateMealBodySchema.parse(request.body)
 
-      const meal = await knex('meals').where('id', id).first()
+      const { userId } = request.user
+
+      const meal = await knex('meals')
+        .where('user_id', userId)
+        .where('id', id)
+        .first()
 
       if (!meal) {
         return reply.status(400).send({
@@ -137,8 +155,9 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { id } = idParamSchema.parse(request.params)
+      const { userId } = request.user
 
-      const meal = await knex('meals').where('id', id)
+      const meal = await knex('meals').where('user_id', userId).where('id', id)
 
       if (!meal) {
         reply.status(404).send()
@@ -155,18 +174,22 @@ export async function mealsRoutes(app: FastifyInstance) {
     {
       preHandler: [authenticate],
     },
-    async (_, reply) => {
-      const totalMeals = (await knex('meals').count('*', { as: 'count' }))[0]
-        .count
+    async (request, reply) => {
+      const { userId } = request.user
+      const totalMeals = (
+        await knex('meals').where('user_id', userId).count('*', { as: 'count' })
+      )[0].count
 
       const totalMealsWithinDiet = (
         await knex('meals')
+          .where('user_id', userId)
           .where('within_diet', true)
           .count('*', { as: 'count' })
       )[0].count
 
       const totalMealsOutsideDiet = (
         await knex('meals')
+          .where('user_id', userId)
           .where('within_diet', false)
           .count('*', { as: 'count' })
       )[0].count
