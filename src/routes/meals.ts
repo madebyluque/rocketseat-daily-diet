@@ -2,137 +2,176 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { knex } from '../database'
 import { randomUUID } from 'crypto'
+import { authenticate } from '../middlewares/authenticate'
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.post('/', async (request, reply) => {
-    const createMealBodySchema = z.object({
-      name: z.string(),
-      description: z.string(),
-      datetime: z.string(),
-      withinDiet: z.boolean(),
-    })
+  app.post(
+    '/',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const createMealBodySchema = z.object({
+        name: z.string(),
+        description: z.string(),
+        datetime: z.string(),
+        withinDiet: z.boolean(),
+      })
 
-    const { name, description, datetime, withinDiet } =
-      createMealBodySchema.parse(request.body)
+      const { name, description, datetime, withinDiet } =
+        createMealBodySchema.parse(request.body)
 
-    await knex('meals').insert({
-      id: randomUUID(),
-      name,
-      description,
-      datetime,
-      within_diet: withinDiet,
-    })
+      await knex('meals').insert({
+        id: randomUUID(),
+        name,
+        description,
+        datetime,
+        within_diet: withinDiet,
+      })
 
-    return reply.status(201).send()
-  })
+      return reply.status(201).send()
+    },
+  )
 
-  app.get('/:id', async (request, reply) => {
-    const { id } = idParamSchema.parse(request.params)
-    const meal = await knex('meals').where('id', id).first()
+  app.get(
+    '/:id',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const { id } = idParamSchema.parse(request.params)
+      const meal = await knex('meals').where('id', id).first()
 
-    if (!meal) {
-      reply.status(404).send()
-    }
+      if (!meal) {
+        reply.status(404).send()
+      }
 
-    reply.status(200).send({
-      meal,
-    })
-  })
+      reply.status(200).send({
+        meal,
+      })
+    },
+  )
 
   // TODO: pagination
-  app.get('/', async (_, reply) => {
-    const meals = await knex('meals').select()
+  app.get(
+    '/',
+    {
+      preHandler: [authenticate],
+    },
+    async (_, reply) => {
+      const meals = await knex('meals').select()
 
-    reply.status(200).send({
-      meals,
-    })
-  })
-
-  app.put('/:id', async (request, reply) => {
-    const { id } = idParamSchema.parse(request.params)
-
-    const updateMealBodySchema = z.object({
-      name: z.string().optional(),
-      description: z.string().optional(),
-      datetime: z.string().optional(),
-      withinDiet: z.boolean().optional(),
-    })
-    const { name, description, datetime, withinDiet } =
-      updateMealBodySchema.parse(request.body)
-
-    const meal = await knex('meals').where('id', id).first()
-
-    if (!meal) {
-      return reply.status(400).send({
-        error: `No meal with the id ${id} has been found.`,
+      reply.status(200).send({
+        meals,
       })
-    }
+    },
+  )
 
-    if (name) {
-      meal.name = name
-    }
+  app.put(
+    '/:id',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const { id } = idParamSchema.parse(request.params)
 
-    if (description) {
-      meal.description = description
-    }
+      const updateMealBodySchema = z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        datetime: z.string().optional(),
+        withinDiet: z.boolean().optional(),
+      })
+      const { name, description, datetime, withinDiet } =
+        updateMealBodySchema.parse(request.body)
 
-    if (datetime) {
-      meal.datetime = datetime
-    }
+      const meal = await knex('meals').where('id', id).first()
 
-    if (withinDiet) {
-      meal.within_diet = withinDiet
-    }
+      if (!meal) {
+        return reply.status(400).send({
+          error: `No meal with the id ${id} has been found.`,
+        })
+      }
 
-    meal.updated_at = new Date().toISOString()
+      if (name) {
+        meal.name = name
+      }
 
-    await knex('meals').where('id', id).update(meal)
+      if (description) {
+        meal.description = description
+      }
 
-    reply.status(200).send({
-      meal,
-    })
-  })
+      if (datetime) {
+        meal.datetime = datetime
+      }
 
-  app.delete('/:id', async (request, reply) => {
-    const { id } = idParamSchema.parse(request.params)
+      if (withinDiet) {
+        meal.within_diet = withinDiet
+      }
 
-    const meal = await knex('meals').where('id', id)
+      meal.updated_at = new Date().toISOString()
 
-    if (!meal) {
-      reply.status(404).send()
-    }
+      await knex('meals').where('id', id).update(meal)
 
-    await knex('meals').where('id', id).delete()
+      reply.status(200).send({
+        meal,
+      })
+    },
+  )
 
-    reply.status(200).send()
-  })
+  app.delete(
+    '/:id',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const { id } = idParamSchema.parse(request.params)
 
-  app.get('/status', async (_, reply) => {
-    const totalMeals = (await knex('meals').count('*', { as: 'count' }))[0]
-      .count
+      const meal = await knex('meals').where('id', id)
 
-    const totalMealsWithinDiet = (
-      await knex('meals').where('within_diet', true).count('*', { as: 'count' })
-    )[0].count
+      if (!meal) {
+        reply.status(404).send()
+      }
 
-    const totalMealsOutsideDiet = (
-      await knex('meals')
-        .where('within_diet', false)
-        .count('*', { as: 'count' })
-    )[0].count
+      await knex('meals').where('id', id).delete()
 
-    const mealsWithinDietPercentage =
-      (Number(totalMealsWithinDiet) / Number(totalMeals)) * 100
+      reply.status(200).send()
+    },
+  )
 
-    // TODO: longest meals inside of diet streak
+  app.get(
+    '/status',
+    {
+      preHandler: [authenticate],
+    },
+    async (_, reply) => {
+      const totalMeals = (await knex('meals').count('*', { as: 'count' }))[0]
+        .count
 
-    reply.status(200).send({
-      totalMeals,
-      totalMealsWithinDiet,
-      totalMealsOutsideDiet,
-      mealsWithinDietPercentage,
-    })
-  })
+      const totalMealsWithinDiet = (
+        await knex('meals')
+          .where('within_diet', true)
+          .count('*', { as: 'count' })
+      )[0].count
+
+      const totalMealsOutsideDiet = (
+        await knex('meals')
+          .where('within_diet', false)
+          .count('*', { as: 'count' })
+      )[0].count
+
+      const mealsWithinDietPercentage =
+        (Number(totalMealsWithinDiet) / Number(totalMeals)) * 100
+
+      // TODO: longest meals inside of diet streak
+
+      reply.status(200).send({
+        totalMeals,
+        totalMealsWithinDiet,
+        totalMealsOutsideDiet,
+        mealsWithinDietPercentage,
+      })
+    },
+  )
 
   const idParamSchema = z.object({
     id: z.string().uuid(),

@@ -8,8 +8,6 @@ import { env } from './env'
 
 export const app = fastify()
 
-// TODO: extract JWT from request
-// TODO: add JWT expiration
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
 })

@@ -4,8 +4,8 @@ Click here to see the [challenge.](https://efficient-sloth-d85.notion.site/Desaf
 
 Create the following endpoints:
 
-- [ ] [POST] /auth
-- [ ] [POST] /users: create an user
+- [ x ] [POST] /auth
+- [ x ] [POST] /users: create an user
 - [ x ] [POST] /meals: register a meal
 - [ x ] [GET] /meals/{id}: get a specific meal
 - [ x ] [GET] /meals: list all meals from user
