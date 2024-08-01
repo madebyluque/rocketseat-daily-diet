@@ -1,19 +1,14 @@
 import fastify from 'fastify'
-import { helloRoutes } from './routes/hello'
-import { mealsRoutes } from './routes/meals'
-import { usersRoutes } from './routes/users'
-import { authRoutes } from './routes/auth'
+import { authRoutes } from './auth/auth.routes'
 import { fastifyJwt } from '@fastify/jwt'
 import { env } from './env'
+import { usersRoutes } from './users/routes/users.routes'
+import { mealsRoutes } from './meals/routes/meals.routes'
 
 export const app = fastify()
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
-})
-
-app.register(helloRoutes, {
-  prefix: 'hello',
 })
 
 app.register(mealsRoutes, {
