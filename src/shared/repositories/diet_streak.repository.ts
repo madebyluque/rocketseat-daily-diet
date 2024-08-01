@@ -23,6 +23,10 @@ export const resetDietStreak = async (userId: string) => {
     throw new Error('It was not possible to reset diet streak counter')
   }
 
+  if (userCounter.count <= 0) {
+    return
+  }
+
   userCounter.active = false
 
   await knex(table).where('id', userCounter.id).update(userCounter)
