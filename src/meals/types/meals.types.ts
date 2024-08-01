@@ -15,7 +15,7 @@ export type MealDto = {
   name: string
   description: string
   datetime: string
-  within_diet: boolean
+  withinDiet: boolean
 }
 
 export const createMealRequest = z.object({

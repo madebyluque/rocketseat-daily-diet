@@ -6,7 +6,7 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --ext .ts --fix",
     "knex": "node --import tsx ./node_modules/knex/bin/cli.js",
-    "test": "vitest",
+    "test": "vitest --no-file-parallelism",
     "build": "tsup src -d build"
   },
   "author": "",

@@ -22,6 +22,8 @@ import {
   resetDietStreak,
 } from '../../shared/repositories/diet_streak.repository'
 
+// TODO: improve error handling
+// TODO: add documentation
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
     '/',
@@ -73,7 +75,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         name: meal.name,
         description: meal.description,
         datetime: meal.datetime,
-        within_diet: meal.within_diet,
+        withinDiet: meal.within_diet,
       }
 
       reply.status(200).send({
@@ -99,7 +101,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         name: meal.name,
         description: meal.description,
         datetime: meal.datetime,
-        within_diet: meal.within_diet,
+        withinDiet: meal.within_diet,
       }))
 
       reply.status(200).send({
@@ -155,7 +157,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         name: meal.name,
         description: meal.description,
         datetime: meal.datetime,
-        within_diet: meal.within_diet,
+        withinDiet: meal.within_diet,
       }
 
       reply.status(200).send({
@@ -176,7 +178,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       const meal = await getMealById(id, userId)
 
       if (!meal) {
-        reply.status(404).send()
+        reply.status(400).send()
       }
 
       await deleteMeal(id)

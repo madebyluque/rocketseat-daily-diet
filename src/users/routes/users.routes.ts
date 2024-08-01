@@ -20,6 +20,6 @@ export async function usersRoutes(app: FastifyInstance) {
 
     await knex('users').insert(user)
 
-    reply.status(200).send()
+    reply.status(201).send()
   })
 }
