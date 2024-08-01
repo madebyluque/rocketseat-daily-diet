@@ -58,8 +58,20 @@ export async function mealsRoutes(app: FastifyInstance) {
     {
       preHandler: [authenticate],
     },
-    async (_, reply) => {
-      const meals = await knex('meals').select()
+    async (request, reply) => {
+      const getAllMealsParamsSchema = z.object({
+        currentPage: z.number().optional().default(1),
+        pageSize: z.number().optional().default(10),
+      })
+
+      const { currentPage, pageSize } = getAllMealsParamsSchema.parse(
+        request.params,
+      )
+
+      const meals = await knex('meals').paginate({
+        perPage: pageSize,
+        currentPage,
+      })
 
       reply.status(200).send({
         meals,
