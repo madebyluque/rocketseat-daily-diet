@@ -16,7 +16,11 @@ import {
   MealDto,
   updateMealrequest,
 } from '../types/meals.types'
-import { idParamSchema } from '../../shared/shared.types'
+import { idParamSchema } from '../../shared/types/shared.types'
+import {
+  increaseDietStreak,
+  resetDietStreak,
+} from '../../shared/repositories/diet_streak.repository'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
@@ -38,6 +42,12 @@ export async function mealsRoutes(app: FastifyInstance) {
         user_id: userId,
       }
       await insertMeal(meal)
+
+      if (meal.within_diet) {
+        await increaseDietStreak(userId)
+      } else {
+        await resetDietStreak(userId)
+      }
 
       return reply.status(201).send()
     },

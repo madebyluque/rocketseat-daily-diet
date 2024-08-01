@@ -1,4 +1,5 @@
 import { knex } from '../../database'
+import { getLongestDietStreak } from '../../shared/repositories/diet_streak.repository'
 import { Meal } from '../types/meals.types'
 
 const table = 'meals'
@@ -61,15 +62,17 @@ export const getStatus = async (userId: string) => {
       .count('*', { as: 'count' })
   )[0].count
 
-  const mealsWithinDietPercentage =
-    (Number(totalMealsWithinDiet) / Number(totalMeals)) * 100
+  const mealsWithinDietPercentage = +Math.round(
+    (Number(totalMealsWithinDiet) / Number(totalMeals)) * 100,
+  ).toFixed(2)
 
-  // TODO: longest meals inside of diet streak
+  const longestDietStreak = await getLongestDietStreak(userId)
 
   return {
     totalMeals,
     totalMealsWithinDiet,
     totalMealsOutsideDiet,
     mealsWithinDietPercentage,
+    longestDietStreak,
   }
 }

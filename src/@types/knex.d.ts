@@ -19,5 +19,11 @@ declare module 'knex/types/tables' {
       email: string
       password: string
     }
+    diet_streaks: {
+      id: string
+      user_id: string
+      count: number
+      active: boolean
+    }
   }
 }
