@@ -17,5 +17,5 @@ Create the following endpoints:
   - Total number of meals within the diet;
   - Total number of meals outside the diet;
   - Longest meals inside of diet streak.
-- [ ] Tests
+- [ x ] Tests
 - [ ] Docs

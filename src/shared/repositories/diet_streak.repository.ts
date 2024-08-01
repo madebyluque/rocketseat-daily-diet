@@ -5,7 +5,6 @@ const table = 'diet_streaks'
 export const increaseDietStreak = async (userId: string) => {
   const userCounter = await getDietStreak(userId)
 
-  // TODO: tratar erros
   if (!userCounter) {
     throw new Error('It was not possible to increase diet streak counter')
   }
@@ -18,7 +17,6 @@ export const increaseDietStreak = async (userId: string) => {
 export const resetDietStreak = async (userId: string) => {
   const userCounter = await getDietStreak(userId)
 
-  // TODO: tratar erros
   if (!userCounter) {
     throw new Error('It was not possible to reset diet streak counter')
   }
