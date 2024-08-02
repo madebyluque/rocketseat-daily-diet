@@ -1,21 +1,24 @@
 import fastify from 'fastify'
-import { authRoutes } from './auth/auth.routes'
+import { authRoutes } from './auth/routes/auth.routes'
 import { fastifyJwt } from '@fastify/jwt'
 import { env } from './env'
 import { usersRoutes } from './users/routes/users.routes'
 import { mealsRoutes } from './meals/routes/meals.routes'
 import cors from '@fastify/cors'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
+import {
+  swaggerOptions,
+  swaggerUiOptions,
+} from './configs/swagger/swagger.configs'
+import { corsConfigs } from './configs/cors/cors.configs'
 
 export const app = fastify()
 
-app.register(cors, {
-  origin: [
-    'http://localhost:8080',
-    'http://127.0.0.1:8080',
-    'http://localhost:3000',
-  ],
-  methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
-})
+app.register(fastifySwagger, swaggerOptions)
+app.register(fastifySwaggerUi, swaggerUiOptions)
+
+app.register(cors, corsConfigs)
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,

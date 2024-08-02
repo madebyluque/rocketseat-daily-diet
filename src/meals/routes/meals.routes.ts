@@ -21,6 +21,7 @@ import {
   increaseDietStreak,
   resetDietStreak,
 } from '../../shared/repositories/diet_streak.repository'
+import { tags } from '../../configs/swagger/tags'
 
 // TODO: add documentation
 export async function mealsRoutes(app: FastifyInstance) {
@@ -28,6 +29,36 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            description: { type: 'string' },
+            datetime: { type: 'string', format: 'date-time' },
+            withinDiet: { type: 'boolean' },
+          },
+        },
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          201: {
+            description: 'Meal created successfully',
+            type: 'null',
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {
@@ -66,6 +97,49 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/:id',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          200: {
+            description: 'Meal found successfully',
+            type: 'object',
+            properties: {
+              meal: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  datetime: { type: 'string', format: 'date-time' },
+                  withinDiet: { type: 'number' },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'Meal not found',
+            type: 'null',
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {
@@ -103,6 +177,51 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          200: {
+            description: 'Meals found successfully',
+            type: 'object',
+            properties: {
+              meals: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    name: { type: 'string' },
+                    description: { type: 'string' },
+                    datetime: { type: 'string', format: 'date-time' },
+                    withinDiet: { type: 'number' },
+                  },
+                },
+              },
+              pagination: {
+                type: 'object',
+                properties: {
+                  currentPage: { type: 'number' },
+                  pageSize: { type: 'number' },
+                  totalItems: { type: 'number' },
+                  totalPages: { type: 'number' },
+                },
+              },
+            },
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {
@@ -140,6 +259,55 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/:id',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            description: { type: 'string' },
+            datetime: { type: 'string', format: 'date-time' },
+            withinDiet: { type: 'boolean' },
+          },
+        },
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          200: {
+            description: 'Meal updated successfully',
+            type: 'object',
+            properties: {
+              meal: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  datetime: { type: 'string', format: 'date-time' },
+                  withinDiet: { type: 'number' },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'Meal not found',
+            type: 'null',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {
@@ -153,9 +321,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         const meal = await getMealById(id, userId)
 
         if (!meal) {
-          return reply.status(400).send({
-            error: `No meal with the id ${id} has been found.`,
-          })
+          return reply.status(404).send()
         }
 
         if (name) {
@@ -203,6 +369,37 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/:id',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          200: {
+            description: 'Meal deleted successfully',
+            type: 'null',
+          },
+          404: {
+            description: 'Meal not found',
+            type: 'null',
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {
@@ -212,7 +409,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         const meal = await getMealById(id, userId)
 
         if (!meal) {
-          reply.status(400).send()
+          reply.status(404).send()
         }
 
         await deleteMeal(id)
@@ -232,6 +429,39 @@ export async function mealsRoutes(app: FastifyInstance) {
     '/status',
     {
       preHandler: [authenticate],
+      schema: {
+        tags: [tags.MEALS],
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
+        response: {
+          200: {
+            description: 'Status calculated successfully',
+            type: 'object',
+            properties: {
+              status: {
+                type: 'object',
+                properties: {
+                  totalMeals: { type: 'number' },
+                  totalMealsWithinDiet: { type: 'number' },
+                  totalMealsOutsideDiet: { type: 'number' },
+                  mealsWithinDietPercentage: { type: 'number' },
+                  longestDietStreak: { type: 'number' },
+                },
+              },
+            },
+          },
+          500: {
+            description: 'Error',
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       try {

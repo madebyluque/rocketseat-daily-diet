@@ -81,7 +81,7 @@ it('- should be able to gel all meals', async () => {
   expect(meals.length).toBe(3)
 })
 
-it('should be able to get a meal by its id', async () => {
+it('- should be able to get a meal by its id', async () => {
   await createTestUser()
   const token = await authenticate()
   const meal = await createTestMeal(token)
@@ -103,7 +103,7 @@ it('should be able to get a meal by its id', async () => {
   )
 })
 
-it('should return 404 when meal is not found', async () => {
+it('- should return 404 when meal is not found', async () => {
   await createTestUser()
   const token = await authenticate()
   await createTestMeal(token)
@@ -115,7 +115,7 @@ it('should return 404 when meal is not found', async () => {
   expect(response.status).toBe(404)
 })
 
-it('should be able to delete a meal by its id', async () => {
+it('- should be able to delete a meal by its id', async () => {
   await createTestUser()
   const token = await authenticate()
   const meal = await createTestMeal(token)
@@ -129,7 +129,7 @@ it('should be able to delete a meal by its id', async () => {
   expect(response.status).toBe(200)
 })
 
-it('should be able to update a meal by its id', async () => {
+it('- should be able to update a meal by its id', async () => {
   await createTestUser()
   const token = await authenticate()
   const meal = await createTestMeal(token)
@@ -155,7 +155,7 @@ it('should be able to update a meal by its id', async () => {
   )
 })
 
-it('should return 400 when meal is not found while trying to update it', async () => {
+it('- should return 404 when meal is not found while trying to update it', async () => {
   await createTestUser()
   const token = await authenticate()
   await createTestMeal(token)
@@ -167,10 +167,10 @@ it('should return 400 when meal is not found while trying to update it', async (
       name: 'test name',
     })
 
-  expect(response.status).toBe(400)
+  expect(response.status).toBe(404)
 })
 
-it('should be able to delete a meal by its id', async () => {
+it('- should be able to delete a meal by its id', async () => {
   await createTestUser()
   const token = await authenticate()
   const meal = await createTestMeal(token)
@@ -184,7 +184,7 @@ it('should be able to delete a meal by its id', async () => {
   expect(response.status).toBe(200)
 })
 
-it('should return 400 when meal is not found while trying to delete it', async () => {
+it('- should return 404 when meal is not found while trying to delete it', async () => {
   await createTestUser()
   const token = await authenticate()
   await createTestMeal(token)
@@ -193,10 +193,10 @@ it('should return 400 when meal is not found while trying to delete it', async (
     .delete(`/meals/b4867f0a-42e2-4464-960d-cc5ae5272072`)
     .set('Authorization', `Bearer ${token}`)
 
-  expect(response.status).toBe(400)
+  expect(response.status).toBe(404)
 })
 
-it('should be able to get status', async () => {
+it('- should be able to get status', async () => {
   await createTestUser()
   const token = await authenticate()
   await createTestMeal(token)
