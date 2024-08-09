@@ -64,7 +64,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       try {
         const { name, description, datetime, withinDiet } =
           createMealRequest.parse(request.body)
-        const { userId } = request.user
+        const { sub } = request.user
 
         const meal: Meal = {
           id: randomUUID(),
@@ -72,14 +72,14 @@ export async function mealsRoutes(app: FastifyInstance) {
           description,
           datetime,
           within_diet: withinDiet,
-          user_id: userId,
+          user_id: sub,
         }
         await insertMeal(meal)
 
         if (meal.within_diet) {
-          await increaseDietStreak(userId)
+          await increaseDietStreak(sub)
         } else {
-          await resetDietStreak(userId)
+          await resetDietStreak(sub)
         }
 
         return reply.status(201).send()
@@ -144,9 +144,9 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       try {
         const { id } = idParamSchema.parse(request.params)
-        const { userId } = request.user
+        const { sub } = request.user
 
-        const meal = await getMealById(id, userId)
+        const meal = await getMealById(id, sub)
 
         if (!meal) {
           return reply.status(404).send()
@@ -229,9 +229,9 @@ export async function mealsRoutes(app: FastifyInstance) {
           request.params,
         )
 
-        const { userId } = request.user
+        const { sub } = request.user
 
-        const mealsPage = await getAllMeals(userId, pageSize, currentPage)
+        const mealsPage = await getAllMeals(sub, pageSize, currentPage)
 
         const dtos: MealDto[] = mealsPage.data.map((meal) => ({
           id: meal.id,
@@ -316,9 +316,9 @@ export async function mealsRoutes(app: FastifyInstance) {
         const { name, description, datetime, withinDiet } =
           updateMealrequest.parse(request.body)
 
-        const { userId } = request.user
+        const { sub } = request.user
 
-        const meal = await getMealById(id, userId)
+        const meal = await getMealById(id, sub)
 
         if (!meal) {
           return reply.status(404).send()
@@ -404,9 +404,9 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       try {
         const { id } = idParamSchema.parse(request.params)
-        const { userId } = request.user
+        const { sub } = request.user
 
-        const meal = await getMealById(id, userId)
+        const meal = await getMealById(id, sub)
 
         if (!meal) {
           reply.status(404).send()
@@ -465,9 +465,9 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const { userId } = request.user
+        const { sub } = request.user
 
-        const status = await getStatus(userId)
+        const status = await getStatus(sub)
 
         if (!status) {
           reply.status(500).send({

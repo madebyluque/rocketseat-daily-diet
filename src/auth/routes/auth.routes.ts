@@ -48,16 +48,12 @@ export async function authRoutes(app: FastifyInstance) {
           })
         }
 
-        const token = app.jwt.sign(
-          {
-            userId: user.id,
-          },
-          { expiresIn: '60m' },
+        const token = await reply.jwtSign(
+          {},
+          { expiresIn: '60m', sub: user.id },
         )
 
-        reply.status(200).send({
-          token,
-        })
+        return reply.status(200).send({ token })
       } catch (error) {
         console.log(error)
         reply.status(500).send({
